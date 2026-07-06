@@ -177,7 +177,8 @@ setAddMessage({
 </div>
 
 <p className="mt-3 text-sm text-amber-600">
-  Add to Cart is disabled because this API's product data has no variants configured, which the cart endpoint requires. Use "Buy Now" to purchase directly.
+  Add to Cart is disabled because this API's product data has no variants configured, which the cart endpoint requires.
+  please Use "Buy Now" to purchase directly.
 </p>
           {addMessage && (
             <p
