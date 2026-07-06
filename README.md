@@ -1,16 +1,40 @@
-# React + Vite
+# E-commus Elegant Store
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a single-page e-commerce storefront built for the Frontend Developer Assignment, consuming the live E-comus REST API. Users can browse products, view details, authenticate, and complete purchases.
 
-Currently, two official plugins are available:
+**Live site:** https://e-commus-elegant-store.vercel.app/
+**Repository:** https://github.com/venusse40/E-commus-elegant-store
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
 
-## React Compiler
+- **Framework:** React + Vite
+- **Routing:** React Router
+- **State Management:** Context API (`AuthContext`, `CartContext`)
+- **HTTP Client:** Axios, centralized in `src/api/`
+- **Styling:** Tailwind CSS
+- **Deployment:** Vercel
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Why Context API over Redux/Zustand
+The app only needs two pieces of global state — auth session and cart — with no complex derived state or middleware requirements. Context API keeps the codebase simpler and faster to build under the assignment's time constraint, without sacrificing clarity.
 
-## Expanding the ESLint configuration
+## Setup & Run Instructions
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Clone the repo:
+```bash
+   git clone https://github.com/venusse40/E-commus-elegant-store.git
+   cd E-commus-elegant-store
+```
+2. Install dependencies:
+```bash
+   npm install
+```
+3. Create a `.env` file in the root (see Environment Variables below).
+4. Run the dev server:
+```bash
+   npm run dev
+```
+5. Open `http://localhost:5173`
+
+## Environment Variables
+
+Create a `.env` file in the project root:
