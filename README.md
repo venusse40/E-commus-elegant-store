@@ -1,6 +1,6 @@
 # E-commus Elegant Store
 
-this is a single-page e-commerce storefront built for the Frontend Developer Assignment, consuming the live E-comus REST API. Users can browse products, view details, authenticate, and complete purchases.
+This is a single-page e-commerce storefront built for the Frontend Developer Assignment, consuming the live E-comus REST API. Users can browse products, view details, authenticate, and complete purchases.
 
 **Live site:** https://e-commus-elegant-store.vercel.app/
 **Repository:** https://github.com/venusse40/E-commus-elegant-store
