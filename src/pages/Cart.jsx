@@ -1,26 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { placeOrder } from "../api/ordersApi";
-import Loader from "../components/ui/Loader";
-import ErrorMessage from "../components/ui/ErrorMessage";
+import axiosClient from "../api/axiosClient";
 import EmptyState from "../components/ui/EmptyState";
 
 export default function Cart() {
-  const { items, total, loading, error, updateQuantity, removeFromCart, refreshCart } =
-    useCart();
+  const { items, total, updateQuantity, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
   const [placing, setPlacing] = useState(false);
   const [orderError, setOrderError] = useState(null);
-  const [orderSuccess, setOrderSuccess] = useState(null);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
-  const handleCheckout = async () => {
+  const handlePlaceOrder = async () => {
     setPlacing(true);
     setOrderError(null);
     try {
-      const res = await placeOrder();
-      setOrderSuccess(res.order || res);
-      await refreshCart();
+      // Buy each cart item individually via the confirmed-working buy-now endpoint
+      for (const item of items) {
+        await axiosClient.post("/api/auth/orders/buy", {
+          productId: item.productId,
+          quantity: item.quantity,
+        });
+      }
+      setOrderSuccess(true);
+      await clearCart();
     } catch (err) {
       setOrderError(
         err.response?.data?.message || "Could not place your order."
@@ -30,9 +33,6 @@ export default function Cart() {
     }
   };
 
-  if (loading) return <Loader label="Loading your cart..." />;
-  if (error) return <ErrorMessage message={error} onRetry={refreshCart} />;
-
   if (orderSuccess) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
@@ -40,7 +40,7 @@ export default function Cart() {
           Order placed! 🎉
         </h2>
         <p className="text-gray-500 mb-6">
-          Thank you for shopping with Elegant Store. Order #{orderSuccess.id || "—"} is confirmed.
+          Thank you for shopping with Elegant Store.
         </p>
         <button
           onClick={() => navigate("/")}
@@ -76,61 +76,52 @@ export default function Cart() {
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Your Cart</h1>
 
       <div className="space-y-4">
-        {items.map((item) => {
-          const name = item.variant?.product?.name || item.product?.name || item.name;
-          const price = item.variant?.price ?? item.price ?? 0;
-          const image =
-            item.variant?.product?.images?.[0]?.url ||
-            item.product?.images?.[0]?.url ||
-            "https://placehold.co/100x100?text=Elegant+Store";
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center gap-4 bg-white border border-gray-100 rounded-xl p-3"
+          >
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-20 h-20 rounded-lg object-cover bg-gray-50"
+              onError={(e) => {
+                e.target.src = "https://placehold.co/100x100?text=Elegant+Store";
+              }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-gray-800 truncate">{item.name}</p>
+              <p className="text-rose-500 text-sm font-semibold">
+                RWF {Number(item.price).toLocaleString()}
+              </p>
 
-          return (
-            <div
-              key={item.id}
-              className="flex items-center gap-4 bg-white border border-gray-100 rounded-xl p-3"
-            >
-              <img
-                src={image}
-                alt={name}
-                className="w-20 h-20 rounded-lg object-cover bg-gray-50"
-                onError={(e) => {
-                  e.target.src = "https://placehold.co/100x100?text=Elegant+Store";
-                }}
-              />
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-800 truncate">{name}</p>
-                <p className="text-rose-500 text-sm font-semibold">
-                  RWF {Number(price).toLocaleString()}
-                </p>
-
-                <div className="flex items-center gap-2 mt-2">
-                  <button
-                    onClick={() =>
-                      updateQuantity(item.id, Math.max(1, item.quantity - 1))
-                    }
-                    className="w-7 h-7 border border-gray-200 rounded-md text-sm hover:bg-gray-50"
-                  >
-                    −
-                  </button>
-                  <span className="text-sm w-6 text-center">{item.quantity}</span>
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="w-7 h-7 border border-gray-200 rounded-md text-sm hover:bg-gray-50"
-                  >
-                    +
-                  </button>
-                </div>
+              <div className="flex items-center gap-2 mt-2">
+                <button
+                  onClick={() =>
+                    updateQuantity(item.id, Math.max(1, item.quantity - 1))
+                  }
+                  className="w-7 h-7 border border-gray-200 rounded-md text-sm hover:bg-gray-50"
+                >
+                  −
+                </button>
+                <span className="text-sm w-6 text-center">{item.quantity}</span>
+                <button
+                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                  className="w-7 h-7 border border-gray-200 rounded-md text-sm hover:bg-gray-50"
+                >
+                  +
+                </button>
               </div>
-
-              <button
-                onClick={() => removeFromCart(item.id)}
-                className="text-xs text-gray-400 hover:text-rose-500 transition"
-              >
-                Remove
-              </button>
             </div>
-          );
-        })}
+
+            <button
+              onClick={() => removeFromCart(item.id)}
+              className="text-xs text-gray-400 hover:text-rose-500 transition"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
       </div>
 
       <div className="mt-8 border-t border-gray-100 pt-6 flex items-center justify-between">
@@ -145,11 +136,11 @@ export default function Cart() {
       )}
 
       <button
-        onClick={handleCheckout}
+        onClick={handlePlaceOrder}
         disabled={placing}
         className="mt-6 w-full py-3 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition disabled:opacity-60"
       >
-        {placing ? "Placing order..." : "Checkout"}
+        {placing ? "Placing order..." : "Place Order"}
       </button>
     </div>
   );

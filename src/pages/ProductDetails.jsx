@@ -52,9 +52,23 @@ setAddMessage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
   const handleAddToCart = async () => {
-  // Disabled: API requires a variantId that doesn't exist in the current product data.
-  // See README for details.
+  await addToCart(
+    {
+      id: product.id,
+      name: product.name,
+      price: displayPrice,
+      image,
+    },
+    1
+  );
+  setAddMessage({ type: "success", text: "Added to cart (local demo cart)!" });
 };
+<button
+  onClick={handleAddToCart}
+  className="px-6 py-3 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-900 transition"
+>
+  Add to Cart
+</button>
 
  const handleBuyNow = async () => {
   if (!isAuthenticated) {

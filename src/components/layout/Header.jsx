@@ -13,7 +13,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+    <header className="sticky top-0 z-40 glass shadow-sm">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
         <Link to="/" className="text-xl font-bold text-rose-500 tracking-tight">
           Elegant Store
@@ -31,6 +31,14 @@ export default function Header() {
               </span>
             )}
           </Link>
+          {isAuthenticated && (
+  <Link
+    to="/orders"
+    className="text-sm font-medium text-gray-600 hover:text-rose-500 transition"
+  >
+    Orders
+  </Link>
+)}
 
           {isAuthenticated ? (
             <div className="flex items-center gap-3">

@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Header from "./components/layout/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Orders from "./pages/Orders";
 
 import Home from "./pages/Home";
 import ProductDetails from "./pages/ProductDetails";
@@ -32,6 +33,14 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="*" element={<NotFound />} />
+              <Route
+  path="/orders"
+  element={
+    <ProtectedRoute>
+      <Orders />
+    </ProtectedRoute>
+  }
+/>
             </Routes>
           </main>
         </div>
